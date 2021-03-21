@@ -1,0 +1,91 @@
+getwd()
+
+# SETTING # working directory
+setwd("C:/Users/user/Desktop/BAU Lessons/2- Marketing Analysis/Hands On Exercises/1- European Sales Dataset R")
+
+# READING # data
+EuropeanSalesData <- read.csv("EuropeanSales.csv", header =T)
+
+library(dplyr)
+library(ggplot2)
+
+# UNDERSTANDING # data
+View(EuropeanSalesData)
+glimpse(EuropeanSalesData)
+attributes(EuropeanSalesData)
+head(EuropeanSalesData)
+unique(EuropeanSalesData$Country)
+table(EuropeanSalesData$Country)
+
+
+# Plotting 
+ggplot(EuropeanSalesData, aes(x = Country , y = SalesPerCapita)) + geom_col()
+
+ggplot(EuropeanSalesData, aes(x= SalesPerCapita , y = Country, color = SalesPerCapita)) + geom_point(size = 8) + geom_segment(aes( yend= Country ,xend = 0 ), size=2) + geom_text(aes(label = SalesPerCapita), color = "White" , size = 3) + labs(title = "SalesPerCapita per Country")+ geom_vline( xintercept = mean(EuropeanSalesData$SalesPerCapita) , color = "red" , linetype = 5) 
+
+ggplot(EuropeanSalesData, aes(x = Population , y = SalesPerCapita , color = "red")) + geom_point(size =3)
+
+ggplot(EuropeanSalesData, aes(x = GDPperHead  , y = SalesPerCapita)) + geom_point(size =3) + geom_smooth()
+
+ggplot(EuropeanSalesData, aes(x = UnemploymentRate   , y = SalesPerCapita)) + geom_point(size =3) + geom_smooth()
+
+ggplot(EuropeanSalesData, aes(x = EducationSpending    , y = SalesPerCapita)) + geom_point(size =3) + geom_smooth()
+
+ggplot(EuropeanSalesData, aes(x = ComputerSales    , y = SalesPerCapita)) + geom_point(size =3) + geom_smooth()
+
+plot(EuropeanSalesData)
+
+
+# Find correlations
+cor(EuropeanSalesData[,])
+# This gives an error because Country is categorical
+
+cor(EuropeanSalesData$SalesPerCapita,EuropeanSalesData$Population)
+cor(EuropeanSalesData$SalesPerCapita, EuropeanSalesData$GDPperHead)
+cor(EuropeanSalesData$SalesPerCapita, EuropeanSalesData$UnemploymentRate)
+cor(EuropeanSalesData$SalesPerCapita, EuropeanSalesData$EducationSpending)
+cor(EuropeanSalesData$SalesPerCapita, EuropeanSalesData$ComputerSales)
+# GDPperHead(0.66) and EducationSpending(0.61) are positively correlated with SalesPerCapita. Other attributes has weak relation.
+
+
+
+# FITTING # linear regression model
+
+LRModel <- lm(SalesPerCapita ~ . , data = EuropeanSalesData)
+summary(LRModel)
+# Turns NA because of 'Country' variable is categorical. 
+
+# Model 1 (all included except Country)
+LRModel1 <- lm(SalesPerCapita ~ . -Country , data = EuropeanSalesData)
+summary(LRModel1)
+# Multiple R-squared:  0.6216,	Adjusted R-squared:  0.4955
+
+# R-squared:  0.6216 (high is good) How well the model is fitting the actual data. The R2 will always increase as more variables are included in the model.
+# Adjusted R-squared:  0.4955 (high is good) Any variable without a strong correlation will make adjusted R-squared decrease.
+# p-value: A variable is considered as insignificant if p-value > 5%. (low is good)
+# t-value : A measure of how many standard deviations our coefficient estimate is far away from 0.(high is good)
+
+# VIF: A general guideline is that a VIF larger than 5 or 10 is large, indicating that the model has problems estimating the coefficient. #rdocumentation.org
+print(car::vif(LRModel1))
+# 
+# Population        GDPperHead  UnemploymentRate EducationSpending     ComputerSales 
+# 4.027274          2.263799          1.466289          1.630553          3.926713 
+
+# Model 2 (Country, ComputerSales excluded.)
+LRModel2 <- lm(SalesPerCapita ~ Population + GDPperHead + UnemploymentRate + EducationSpending  , data = EuropeanSalesData)
+summary(LRModel2)
+# Multiple R-squared:  0.5639,	Adjusted R-squared:  0.4549
+# GDPperHead has * next to p-value. This means GDPperHead has statistical significance.
+
+# Model 3 (Only GDPperHead and EducationSpending)
+LRModel3 <- lm(SalesPerCapita ~ GDPperHead + EducationSpending  , data = EuropeanSalesData)
+summary(LRModel3)
+# Multiple R-squared:  0.5141,	Adjusted R-squared:  0.4601
+
+layout(matrix(c(1,2,3,4),2,2)) 
+plot(LRModel1)
+plot(LRModel2)
+plot(LRModel3)
+
+
+# Model 2 and 3 quite similar. I would choose "Model 2" because of it's higher R2 value and close Adj-R2 value.
