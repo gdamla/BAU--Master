@@ -1,10 +1,10 @@
 # EUROPEAN SALES DATA / LINEAR REGRESSION MODEL
-# Gülhan Damla Aþýk - 2000136
+# GÃ¼lhan Damla AÃ¾Ã½k - 2000136
 
 getwd()
 
 # SETTING # working directory
-setwd("C:/Users/user/Desktop/BAU Lessons/2- Marketing Analysis/Hands On Exercises/1- European Sales Dataset R")
+setwd("C:/Users/user/.../1- European Sales Dataset R")
 
 # READING # data
 EuropeanSalesData <- read.csv("EuropeanSales.csv", header =T)
