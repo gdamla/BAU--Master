@@ -1,5 +1,5 @@
 # EUROPEAN SALES DATA / LINEAR REGRESSION MODEL
-# Gülhan Damla Aþýk - 2000136
+# Gülhan Damla Aşık
 
 getwd()
 
